@@ -1,0 +1,81 @@
+*{
+    margin: 0;
+    padding: 0;
+    background-color:  #0B0D16;
+    font-family: 'Poppins', sans-serif;
+}
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+}
+p{
+    color: #E9E9E9;
+    font-size: 4rem;
+    font-weight: 600;
+    line-height:68px;
+    text-align: center;
+    
+}
+.desc{
+    line-height: 40px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #A5A5A5;
+
+}
+label{
+    font-weight: 600;
+    font-size: 14px;
+    margin: 10px;
+    margin-left: 0;
+    color:#E9E9E9;
+    display: block;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-start;
+}
+input{
+    color: #E9E9E9;
+    width: 440px;
+    height: 20px;
+    background-color: #2A324F;
+    border-radius: 6px;
+    border: none;
+    padding: 10px;
+}
+button{
+    margin-top: 10px;
+    color: #E9E9E9;
+    background-color: #428CFC;
+    width: 30%;
+    border: none ;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 6px;
+    align-self: flex-end; 
+}
+.Already{
+    height: 10px;
+    display: inline;
+    color: #A5A5A5;
+    font-size: 0.8rem;
+    align-self: flex-start;
+}
+a{
+    color: #428CFC;
+}
