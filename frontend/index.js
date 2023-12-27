@@ -18,9 +18,8 @@ signupBtn.addEventListener('click', async (e) =>{
     })
     if(result.ok){
         console.log("USER CREATED")
+        document.getElementById('registered').style.display='flex'
     }else{
-        const errorData = await result.json();  // Assuming the error response is JSON
-        console.error("Error:", errorData);
-        console.log("error")
+       
     }
 })

@@ -1,10 +1,11 @@
 *{
     margin: 0;
     padding: 0;
-    background-color:  #0B0D16;
+    
     font-family: 'Poppins', sans-serif;
 }
 body{
+    background-color:  #0B0D16;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -79,3 +80,43 @@ button{
 a{
     color: #428CFC;
 }
+.registered{
+  display: none;
+  justify-content: center;
+  font-weight: 600;
+  align-items: center;
+  width:100%;
+  max-width: 400px;
+  height: 44px;
+  border-radius: 12px;
+  border:2px solid #346532;
+  background-color: #D4EDDA;
+  position: absolute;
+  top:5rem;
+}
+.registered p{
+    font-size: 0.9rem;
+    color:#346532;
+}
+
+.usernameExists{
+    display: none;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    align-items: center;
+    width:100%;
+    max-width: 400px;
+    height: 44px;
+    color:#B53535;
+    border-radius: 12px;
+    border:2px solid #B53535;
+    background-color: #EDD4D4;
+    position: absolute;
+    top:5rem;
+  }
+
+  .usernameExists p{
+    color: #B53535;
+    font-size: 0.9rem;
+  }

@@ -6,7 +6,7 @@ const PORT = 3000
 const http = require('http')
 const cors = require('cors')
 
-app.use(express.json());
+app.use(express.json())
 app.use(cors());
 app.options('*', cors());
 
@@ -20,14 +20,11 @@ db.once('open',()=>{
 })
 
 app.post("/signup" , async (req,res) =>{
-    console.log(req.body)
     const {username , password } = req.body
-    console.log(username)
-   
     try{
 
         const userInDB = await user.findOne({username})
-        if(userInDB.username == username){
+        if(userInDB){
             return res.status(409).json({
                 message:"user already exists"
             })
@@ -48,6 +45,32 @@ app.post("/signup" , async (req,res) =>{
     }
 })
 
+app.post('/login', async (req, res) => {
+    console.log(req.body)
+    const { username, password } = req.body;
+    try {
+        const isUser = await user.findOne({ username });
+        if (isUser) {
+            if (isUser.password == password) {
+                return res.status(200).json({
+                    message: "Successful Login"
+                });
+            } else {
+                return res.status(409).json({
+                    message: "Invalid username or password"
+                });
+            }
+        } else {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "Server Error"
+        });
+    }
+});
 
 
 app.listen(PORT, () =>{
