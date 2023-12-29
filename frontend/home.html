@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="home.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js" integrity="sha512-zoJXRvW2gC8Z0Xo3lBbao5+AS3g6YWr5ztKqaicua11xHo+AvE1b0lT9ODgrHTmNUxeCw0Ry4BGRYZfXu70weg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="topbar">
+            <p>Your Chats</p>
+            <img src="add.png" alt="">
+            <img src="Ellipse 12.png" alt="" class="dp">
+            <p class="current-user" id="current-user">User_test</p>
+        </div>
+        <div class="main-section">
+            <div class="side-panel">
+                <ul>
+                    <li>
+                        <div class="added-user">
+                            <img src="Ellipse 8.png" alt="">
+                            <p>User_test</p>
+    
+                        </div>
+                    </li>
+                    <li>
+                        <div class="added-user">
+                            <img src="Ellipse 8.png" alt="">
+                            <p>User_test</p>
+    
+                        </div>
+                    </li>
+                    <li>
+                        <div class="added-user">
+                            <img src="Ellipse 8.png" alt="">
+                            <p>User_test</p>
+    
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="chat-section">
+                <div class="message-area">
+                    <div class="received">
+                        <p>Hello , how are you?</p>
+                    </div>
+                    <div class="sent">
+                        <p>Hey</p>
+                    </div>
+                </div>
+                <div class="input-area">
+                    <form action="" id="msg">
+                        <input type="text" name="" id="input" placeholder="Enter your message...">
+                        <button><img src="free-send-forward-arrow-right-direction-import-30559 1.png" alt=""></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="home.js"></script>
+</body>
+</html>
