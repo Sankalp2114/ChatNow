@@ -76,14 +76,23 @@ ul{
 .chat-section{
     flex-grow: 1;
 }
-.message-area{
-    height: 90%;
+.message-area {
+    height: 85%;
     padding: 0 20px;
     color: #E5E5E5;
     font-size: 16px;
     font-weight: 600;
-    
+    overflow-y: auto;
 }
+.message-area {
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.message-area::-webkit-scrollbar {
+    display: none;
+}   
 .received{
     margin-top: 20px;
     width: auto;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const cors = require('cors');
 const user = require('./models/user');
+const Chat = require('./models/chat');
 const express = require('express');
 const {createServer} = require('http');
 const {Server} = require('socket.io');
@@ -36,20 +37,60 @@ db.once('open', () => {
     console.log("Database connected");
 });
 
-io.on('connection', (socket) => {
-    console.log(`User connected: ${socket.id}`);
 
-    socket.on('chat-message', (message) => {
-
-        io.emit('chat-message', message);
-    });
-
-    socket.on('disconnect', () => {
-        console.log(`User disconnected: ${socket.id}`);
-
-    });
+app.get('/get-users', async (req, res) => {
+    try {
+        const users = await user.find({}, 'username');
+        res.json(users);
+    } catch (error) {
+        console.error('Error getting users:', error);
+        res.status(500).json({ message: 'Server Error' });
+    }
 });
 
+
+io.on('connection', (socket) => {
+    console.log(`User connected: ${socket.id}`);
+    socket.emit('user-list', getUsersList());
+    socket.on('get-previous-messages', async (username) => {
+        try {
+            const messages = await Chat.find({}).sort({ createdAt: 1 }).exec();
+            socket.emit('previous-messages', messages);
+        } catch (error) {
+            console.error('Error getting previous messages:', error);
+        }
+    });
+    socket.on('chat-message', async (data) => {
+
+        socket.broadcast.emit('chat-message', { type: 'received', message: data.message });
+
+        const chatMessage = new Chat({
+            username: data.username,
+            message: data.message,
+        });
+    
+        try {
+            await chatMessage.save();
+            console.log('Message saved to MongoDB');
+        } catch (error) {
+            console.error('Error saving message to MongoDB:', error);
+        }
+    });
+ 
+    socket.on('disconnect', () => {
+       console.log(`User disconnected: ${socket.id}`);
+    });
+ });
+ async function getUsersList() {
+    try {
+        const users = await user.find({}, 'username');
+        return users.map(user => user.username);
+    } catch (error) {
+        console.error('Error getting users:', error);
+        return [];
+    }
+}
+ 
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));
 });
@@ -88,7 +129,8 @@ app.post('/login', async (req, res) => {
         if (isUser) {
             if (isUser.password == password) {
                 return res.status(200).json({
-                    message: "Successful Login"
+                    message: "Successful Login",
+                    username: username,
                 });
             } else {
                 return res.status(409).json({

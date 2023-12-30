@@ -16,7 +16,9 @@ loginBtn.addEventListener('click', async (e)=>{
         })
     })
     if(result.ok){
-        window.location.replace('home.html')
+        const responseData = await result.json();
+        localStorage.setItem('username', responseData.username);
+        window.location.replace('home.html');
     }else{
         document.getElementById('usernameExists').style.display='flex'
         document.getElementById('username').valu=''
