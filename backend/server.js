@@ -38,20 +38,10 @@ db.once('open', () => {
 });
 
 
-app.get('/get-users', async (req, res) => {
-    try {
-        const users = await user.find({}, 'username');
-        res.json(users);
-    } catch (error) {
-        console.error('Error getting users:', error);
-        res.status(500).json({ message: 'Server Error' });
-    }
-});
-
-
-io.on('connection', (socket) => {
+io.on('connection', async (socket) => {
     console.log(`User connected: ${socket.id}`);
-    socket.emit('user-list', getUsersList());
+    
+
     socket.on('get-previous-messages', async (username) => {
         try {
             const messages = await Chat.find({}).sort({ createdAt: 1 }).exec();
@@ -60,15 +50,15 @@ io.on('connection', (socket) => {
             console.error('Error getting previous messages:', error);
         }
     });
-    socket.on('chat-message', async (data) => {
 
+    socket.on('chat-message', async (data) => {
         socket.broadcast.emit('chat-message', { type: 'received', message: data.message });
 
         const chatMessage = new Chat({
             username: data.username,
             message: data.message,
         });
-    
+
         try {
             await chatMessage.save();
             console.log('Message saved to MongoDB');
@@ -76,20 +66,21 @@ io.on('connection', (socket) => {
             console.error('Error saving message to MongoDB:', error);
         }
     });
- 
+
     socket.on('disconnect', () => {
-       console.log(`User disconnected: ${socket.id}`);
+        console.log(`User disconnected: ${socket.id}`);
     });
- });
- async function getUsersList() {
+});
+
+app.get('/getusers', async (req, res) => {
     try {
         const users = await user.find({}, 'username');
-        return users.map(user => user.username);
+        res.json(users);
     } catch (error) {
         console.error('Error getting users:', error);
-        return [];
+        res.status(500).json({ message: 'Server Error' });
     }
-}
+});
  
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));

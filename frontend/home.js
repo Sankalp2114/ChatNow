@@ -20,7 +20,7 @@ function updateUsersList(users) {
    });
 }
 
-fetch('http://localhost:3000/get-users')
+fetch('http://localhost:3000/getusers')
    .then(response => response.json())
    .then(users => updateUsersList(users))
    .catch(error => console.error('Error fetching users:', error));
