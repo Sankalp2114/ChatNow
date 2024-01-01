@@ -9,6 +9,10 @@ const chatSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    sentTo: {
+        type: String,
+        required: true,
+    },
     timestamp: {
         type: Date,
         default: Date.now,

@@ -41,22 +41,13 @@ db.once('open', () => {
 io.on('connection', async (socket) => {
     console.log(`User connected: ${socket.id}`);
     
-
-    socket.on('get-previous-messages', async (username) => {
-        try {
-            const messages = await Chat.find({}).sort({ createdAt: 1 }).exec();
-            socket.emit('previous-messages', messages);
-        } catch (error) {
-            console.error('Error getting previous messages:', error);
-        }
-    });
-
     socket.on('chat-message', async (data) => {
         socket.broadcast.emit('chat-message', { type: 'received', message: data.message });
 
         const chatMessage = new Chat({
             username: data.username,
             message: data.message,
+            sentTo: data.sentTo,
         });
 
         try {
@@ -64,6 +55,22 @@ io.on('connection', async (socket) => {
             console.log('Message saved to MongoDB');
         } catch (error) {
             console.error('Error saving message to MongoDB:', error);
+        }
+    });
+
+    socket.on('get-chat-history', async ({ username, sentTo }) => {
+        try {
+        
+            const chatHistory = await Chat.find({
+                $or: [
+                    { username, sentTo },
+                    { username: sentTo, sentTo: username },
+                ],
+            }).sort({ timestamp: 1 }).exec();
+
+            socket.emit('chat-history', chatHistory);
+        } catch (error) {
+            console.error('Error getting chat history:', error);
         }
     });
 
@@ -81,7 +88,7 @@ app.get('/getusers', async (req, res) => {
         res.status(500).json({ message: 'Server Error' });
     }
 });
- 
+    
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'));
 });

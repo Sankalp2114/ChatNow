@@ -9,14 +9,25 @@ function updateUsersList(users) {
 
    sidePanel.innerHTML = '';
    users.forEach((user) => {
-       const listItem = document.createElement('li');
-       listItem.innerHTML = `
-           <div class="added-user">
-               <img src="Ellipse 8.png" alt="">
-               <p>${user.username}</p>
-           </div>
-       `;
-       sidePanel.appendChild(listItem);
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+         <div class="added-user">
+            <img src="assets/Ellipse 8.png" alt="">
+            <p id="listUsername">${user.username}</p>
+         </div>
+         `;
+      sidePanel.appendChild(listItem);
+
+      listItem.addEventListener('click', () => {
+      
+         const usernameInList = listItem.querySelector('#listUsername');
+         selectedUsername = usernameInList.textContent;
+
+         socket.emit('get-chat-history', { username: localStorage.getItem('username'), sentTo: selectedUsername });
+
+         console.log(`Selected Username: ${selectedUsername}`);
+         document.getElementById('current-user').innerText=`${selectedUsername}`
+     });
    });
 }
 
@@ -24,30 +35,6 @@ fetch('http://localhost:3000/getusers')
    .then(response => response.json())
    .then(users => updateUsersList(users))
    .catch(error => console.error('Error fetching users:', error));
-
-document.addEventListener('DOMContentLoaded', async () => {
-   const username = localStorage.getItem('username');
-
-   if (username) {
-      try {
-      
-         socket.emit('get-previous-messages', username);
-
-         socket.on('previous-messages', (messages) => {
-
-            messages.forEach((message) => {
-
-               const messageType = message.username === username ? 'sent' : 'received';
-               appendMessage({ type: messageType, message: message.message });
-            });
-
-            scrollBottom();
-         });
-      } catch (error) {
-         console.error('Error loading messages:', error);
-      }
-   }
-});
 
 
 const messageInput = document.querySelector('form input');
@@ -67,7 +54,8 @@ form.addEventListener('submit', (e) => {
 
    appendMessage({ type: 'sent', message });
 
-   socket.emit('chat-message', { type: 'sent', message, username });
+   socket.emit('chat-message', { type: 'sent', message, username, sentTo: selectedUsername });
+
 
    messageInput.value = '';
 });
@@ -89,4 +77,20 @@ function appendMessage(data) {
 
     messageArea.appendChild(messageDiv);
     scrollBottom()
+}
+
+socket.on('chat-history', (chatHistory) => {
+   clearMessages();
+
+   chatHistory.forEach((message) => {
+       const messageType = message.username === localStorage.getItem('username') ? 'sent' : 'received';
+       appendMessage({ type: messageType, message: message.message });
+   });
+
+   scrollBottom();
+});
+
+function clearMessages() {
+   const messageArea = document.querySelector('.message-area');
+   messageArea.innerHTML = '';
 }
