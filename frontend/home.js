@@ -1,4 +1,10 @@
+if(!localStorage.getItem('username')){
+   window.location.replace('index.html')
+}
+
 const socket = io('http://localhost:3000');
+
+const addUser = document.getElementById('addUser')
 
 socket.on('user-list', (users) => {
    updateUsersList(users);
@@ -17,6 +23,9 @@ function updateUsersList(users) {
          </div>
          `;
       sidePanel.appendChild(listItem);
+      if(user.username == localStorage.getItem('username')){
+         listItem.innerHTML=''
+      }
 
       listItem.addEventListener('click', () => {
       
@@ -25,13 +34,13 @@ function updateUsersList(users) {
 
          socket.emit('get-chat-history', { username: localStorage.getItem('username'), sentTo: selectedUsername });
 
-         console.log(`Selected Username: ${selectedUsername}`);
          document.getElementById('current-user').innerText=`${selectedUsername}`
      });
    });
 }
 
-fetch('http://localhost:3000/getusers')
+const username = localStorage.getItem('username');
+fetch(`http://localhost:3000/getusers?username=${username}`)
    .then(response => response.json())
    .then(users => updateUsersList(users))
    .catch(error => console.error('Error fetching users:', error));
@@ -51,8 +60,11 @@ form.addEventListener('submit', (e) => {
 
    const message = messageInput.value;
    const username = localStorage.getItem('username'); 
+   if(messageInput.value.trim() != ''){
+      appendMessage({ type: 'sent', message });
 
-   appendMessage({ type: 'sent', message });
+   }
+
 
    socket.emit('chat-message', { type: 'sent', message, username, sentTo: selectedUsername });
 
@@ -94,3 +106,40 @@ function clearMessages() {
    const messageArea = document.querySelector('.message-area');
    messageArea.innerHTML = '';
 }
+
+async function displayFriends() {
+   try {
+       const username = localStorage.getItem('username');
+       const response = await fetch(`http://localhost:3000/getusers?username=${username}`);
+       const users = await response.json();
+       updateUsersList(users);
+   } catch (error) {
+       console.error('Error fetching users:', error);
+   }
+}
+
+displayFriends();
+
+
+addUser.addEventListener('click',async ()=>{
+   const username = localStorage.getItem('username')
+   
+   const friend = prompt('Enter username to add your friend:')
+   
+   const result = await fetch('http://localhost:3000/addFriend',{
+      method:'POST',
+      headers:{
+         'Content-Type':'application/json'
+      },
+      body :JSON.stringify({
+         username,
+         friend
+      })
+   })
+   if(result.ok){
+      alert("Friend added.")
+      displayFriends();
+   }else{
+      alert("No such user exists.")
+   }
+})

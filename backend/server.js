@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const user = require('./models/user');
 const Chat = require('./models/chat');
+const userList =  require('./models/userlist');
 const express = require('express');
 const {createServer} = require('http');
 const {Server} = require('socket.io');
@@ -11,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: 'http://127.0.0.1:5500',
+      origin: 'http://127.0.0.1:5501',
       methods: ['GET', 'POST'],
       credentials: true,
       allowedHeaders: ['my-custom-header'],
@@ -81,16 +82,20 @@ io.on('connection', async (socket) => {
 
 app.get('/getusers', async (req, res) => {
     try {
-        const users = await user.find({}, 'username');
-        res.json(users);
+        const username = req.query.username;
+        const userFriends = await userList.findOne({ username }, 'ChattingTo');
+        
+        if (userFriends) {
+            const friendUsernames = userFriends.ChattingTo;
+            const friends = await user.find({ username: { $in: friendUsernames } }, 'username');
+            res.json(friends);
+        } else {
+            res.json([]);
+        }
     } catch (error) {
         console.error('Error getting users:', error);
         res.status(500).json({ message: 'Server Error' });
     }
-});
-    
-app.get('/', (req, res) => {
-    res.sendFile(join(__dirname, 'index.html'));
 });
 
 app.post("/signup" , async (req,res) =>{
@@ -152,3 +157,52 @@ app.post('/login', async (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server is listening on port: ${PORT}`);
 });
+app.post('/addFriend', async (req, res) => {
+    const { username, friend } = req.body;
+
+    try {
+
+        const isUser = await user.findOne({ username: friend });
+        if (!isUser) {
+            return res.status(404).json({
+                message: "No such user",
+            });
+        }
+        const isInUserList = await userList.findOne({ username });
+
+        if (!isInUserList) {
+
+            await userList.create({
+                username,
+                ChattingTo: [friend],
+            });
+        } else {
+
+            await userList.updateOne(
+                { username },
+                { $push: { ChattingTo: friend } }
+            );
+        }
+        const isFriendInUserList = await userList.findOne({ username: friend });
+        if (!isFriendInUserList) {
+            await userList.create({
+                username: friend,
+                ChattingTo: [username],
+            });
+        } else {
+            await userList.updateOne(
+                { username: friend },
+                { $push: { ChattingTo: username } }
+            );
+        }
+
+        return res.status(201).json({
+            message: 'Friend added',
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal server error',
+        });
+    }
+});
+
