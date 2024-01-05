@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: 'http://127.0.0.1:5501',
+      origin: '*',
       methods: ['GET', 'POST'],
       credentials: true,
       allowedHeaders: ['my-custom-header'],
@@ -30,7 +30,7 @@ app.use(cors({
 
 app.options('*', cors());
 
-mongoose.connect('mongodb+srv://sankalp2114:Sanku1744@ChatNow.x1bfsss.mongodb.net/ChatNow', {});
+mongoose.connect('Your mongodb url', {});
 
 const db = mongoose.connection;
 
